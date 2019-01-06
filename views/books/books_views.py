@@ -15,8 +15,8 @@ from conf.base import (
 )
 
 from models.books_model import (
-    search_book_limit, add_book,search_book_by_book_id,
-    search_all_book, update_book, delete_book
+    search_book_by_name, add_book, search_book_by_book_id,
+    search_all_book, update_book, delete_book, search_book_by_key
 )
 
 
@@ -57,7 +57,7 @@ class SearchByBookIdHandle(tornado.web.RequestHandler):
         http_simple_response(self, OK_CODE, '查询成功！', books)
 
 
-class SearchByKeyHandle(tornado.web.RequestHandler):
+class SearchByNameHandle(tornado.web.RequestHandler):
 
     def data_received(self, chunk):
         pass
@@ -72,8 +72,30 @@ class SearchByKeyHandle(tornado.web.RequestHandler):
         except:
             http_params_error_response(self)
             return
-        books = search_book_limit(key, page)
+        books = search_book_by_name(key, page)
         http_simple_response(self, OK_CODE, '查询成功！', books)
+        logger.debug("Search: search key = %s", key)
+
+
+class SearchByKeyHandle(tornado.web.RequestHandler):
+
+    def data_received(self, chunk):
+        pass
+
+    def get(self, *args, **kwargs):
+        try:
+            key = self.get_argument('key')
+            page = self.get_argument('page')
+            type = self.get_argument('type')
+        except:
+            http_params_error_response(self)
+            return
+        type = int(type)
+        books = search_book_by_key(key, type, page)
+        if books:
+            http_simple_response(self, OK_CODE, '查询成功！', books)
+        else:
+            http_simple_response(self, OK_CODE, '无结果！', books)
         logger.debug("Search: search key = %s", key)
 
 

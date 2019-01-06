@@ -183,7 +183,8 @@ def insert_record(user_id, book_id):
         # 先检查数据库中该书籍是否被借出
         cursor.execute("SELECT state FROM Book WHERE bookId = %s", (book_id,))
         conn.commit()
-        if not cursor.fetchone():
+        state = cursor.fetchone()
+        if state == 1:
             return False, '书籍已被借出！'
         # 插入数据
         cursor.execute("INSERT INTO Borrow_Record VALUES(%s,%s,%s,%s)",

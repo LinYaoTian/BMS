@@ -134,9 +134,7 @@ def insert_user(user):
     conn = get_conn()
     cursor = conn.cursor(buffered=True)
     try:
-        cursor.execute("SELECT * FROM User WHERE userId = %s", (user['user_id'],))
-        conn.commit()
-        value = cursor.fetchone()
+        value = check_user_exist(user['user_id'])
         if value:
             return False, "该账号已存在！"
         cursor.execute("INSERT INTO User values(%s,%s,%s,%s,%s,%s) ",

@@ -1,5 +1,6 @@
 from conf.base import get_conn
 
+
 def tuples_to_dic(values):
     """
     对数据库的查询结果进行转换
@@ -126,18 +127,18 @@ def search_book_by_book_id(book_id):
         return None
 
 
-def search_book_limit(key, page):
+def search_book_by_name(name, page):
     """
     检索书籍
-    :param key: 查询的关键字
+    :param name: 查询的关键字
     :param page: 页数（start:0）
     :return:
     """
     conn = get_conn()
     cursor = conn.cursor(buffered=True)
-    key = '%' + key + '%'
+    name = '%' + name + '%'
     page = int(page) * 15
-    cursor.execute("SELECT * FROM book WHERE name like %s limit 15 offset %s", (key, page,))
+    cursor.execute("SELECT * FROM book WHERE name like %s limit 15 offset %s", (name, page,))
     conn.commit()
     values = cursor.fetchall()
     cursor.close()
@@ -146,6 +147,40 @@ def search_book_limit(key, page):
         return tuples_to_dic(values)
     else:
         return None
+
+
+def search_book_by_author(author, page):
+    """
+    检索书籍
+    :param name: 查询的关键字
+    :param page: 页数（start:0）
+    :return:
+    """
+    conn = get_conn()
+    cursor = conn.cursor(buffered=True)
+    author = '%' + author + '%'
+    page = int(page) * 15
+    cursor.execute("SELECT * FROM book WHERE author like %s limit 15 offset %s", (author, page,))
+    conn.commit()
+    values = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    if values:
+        return tuples_to_dic(values)
+    else:
+        return None
+
+
+def search_book_by_key(key, type, page):
+    if type == 1:
+        # ID
+        return search_book_by_book_id(key)
+    elif type == 0:
+        # 书名
+        return search_book_by_name(key, page)
+    else:
+        # 作者
+        return search_book_by_author(key, page)
 
 
 def check_book_exist(book_id):
